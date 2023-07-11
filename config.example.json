@@ -1,0 +1,47 @@
+{ 
+  
+    "inbounds": [
+        {
+            "type": "mixed",
+            "tag": "mixed-in",
+            "listen": "127.0.0.1",
+            "listen_port": 8081,
+            "tcp_fast_open": false,
+            "udp_fragment": false,
+            "sniff": false,
+            "sniff_override_destination": false,
+            "sniff_timeout": "300ms",
+            "udp_timeout": 300,
+            "proxy_protocol": false,
+            "proxy_protocol_accept_no_header": false,
+            "set_system_proxy": false
+        }
+    ],
+    "outbounds": [
+        {
+            "type": "vless",
+            "tag": "vless-out",
+            "server": "{set}",
+            "server_port": {set},
+            "uuid": "{set}",
+            "flow": "{set}",
+            "network": "{set}",
+            "tls": {
+                "enabled": true,
+                "server_name": "{set}",
+                "utls": {
+                    "enabled": true,
+                    "fingerprint": "{set}"
+                },
+                "reality": {
+                    "enabled": true,
+                    "public_key": "{set}",
+                    "short_id": "{set}"
+                }
+            }
+        }
+    ],
+    "route": {
+
+    }
+}

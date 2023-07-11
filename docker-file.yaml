@@ -1,0 +1,6 @@
+services:
+  tester:
+    build:
+      context: .
+    container_name: v2ray_tester
+
