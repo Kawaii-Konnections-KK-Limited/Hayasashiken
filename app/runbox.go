@@ -87,7 +87,7 @@ func Run(wg *sync.WaitGroup) error {
 	for {
 		instance, cancel, err := create(wg)
 		if err != nil {
-			return err
+			fmt.Println(err)
 		}
 
 		for {
