@@ -1,0 +1,2 @@
+# Hayasashiken
+simple speed test
