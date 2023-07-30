@@ -1,38 +1,35 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"net/http"
-	"net/url"
 	"os"
-	"sync"
+	"os/signal"
 
-	"github.com/uussoop/v2ray_test/app"
+	"github.com/uussoop/v2ray_test/run"
 )
 
+func init() {
+	_, cancel := context.WithCancel(context.Background())
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt)
+	go func() {
+
+		<-sigCh
+
+		fmt.Println("Received SIGINT signal")
+
+		cancel() // Cancel the context when SIGINT is received
+
+	}()
+}
 func main() {
-	var wg sync.WaitGroup
-	wg.Add(1)
+	fmt.Println(os.Args)
+	if len(os.Args) < 3 {
+		fmt.Println("config mode initiated by default, if you want to run by link use: ./v2ray_test link destinationlink")
+		run.RunByConfigFile()
 
-	go app.Run(&wg)
-	wg.Wait()
-	// time.Sleep(5 * time.Second)
-	proxyUrl, err := url.Parse("http://127.0.0.1:8081")
-	if err != nil {
-		fmt.Println("Error:", err)
-	}
-	client := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}
-	if len(os.Args) < 2 {
-		fmt.Println("Please provide a link.")
-		return
-	}
-	link := os.Args[1]
-	timeout := int32(50000) // timeout in milliseconds
-	rtt, testerr := app.UrlTest(client, link, timeout)
-	if testerr != nil {
-		fmt.Println("Error:", testerr)
 	} else {
-		fmt.Println("RTT:", rtt, "ms")
+		run.SingByLink(&os.Args[1], os.Args[2])
 	}
-
 }

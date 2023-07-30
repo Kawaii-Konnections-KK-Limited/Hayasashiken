@@ -1,4 +1,4 @@
-package app
+package core
 
 import (
 	"context"
@@ -17,6 +17,81 @@ import (
 
 var disableColor bool
 
+func RunByLink(wg *sync.WaitGroup, config *[]byte) error {
+	osSignals := make(chan os.Signal, 1)
+	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
+	defer signal.Stop(osSignals)
+	for {
+		instance, cancel, err := createByLink(wg, config)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		for {
+			osSignal := <-osSignals
+			if osSignal == syscall.SIGHUP {
+
+				if err != nil {
+					log.Error(E.Cause(err, "reload service"))
+					continue
+				}
+			}
+			cancel()
+			closeCtx, closed := context.WithCancel(context.Background())
+			go closeMonitor(closeCtx)
+			instance.Close()
+			closed()
+			if osSignal != syscall.SIGHUP {
+				return nil
+			}
+			break
+		}
+	}
+}
+func createByLink(wg *sync.WaitGroup, config *[]byte) (*box.Box, context.CancelFunc, error) {
+
+	var options option.Options
+	err := options.UnmarshalJSON(*config)
+
+	if err != nil {
+		return nil, nil, err
+	}
+	if disableColor {
+		if options.Log == nil {
+			options.Log = &option.LogOptions{}
+		}
+		options.Log.DisableColor = true
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	instance, err := box.New(box.Options{
+		Context: ctx,
+		Options: options,
+	})
+	if err != nil {
+		cancel()
+		return nil, nil, E.Cause(err, "create service")
+	}
+	wg.Done()
+	osSignals := make(chan os.Signal, 1)
+	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
+	defer func() {
+		signal.Stop(osSignals)
+		close(osSignals)
+	}()
+
+	go func() {
+		_, loaded := <-osSignals
+		if loaded {
+			cancel()
+		}
+	}()
+	err = instance.Start()
+	if err != nil {
+		cancel()
+		return nil, nil, E.Cause(err, "start service")
+	}
+	return instance, cancel, nil
+}
 func create(wg *sync.WaitGroup) (*box.Box, context.CancelFunc, error) {
 	var (
 		configContent []byte

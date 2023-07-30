@@ -1,4 +1,4 @@
-package app
+package raytest
 
 import (
 	"context"
@@ -7,11 +7,12 @@ import (
 	"math/rand"
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 )
 
-func UrlTest(client *http.Client, link string, timeout int32) (int32, error) {
+func urlTest(client *http.Client, link string, timeout int32) (int32, error) {
 	if client == nil {
 		return 0, fmt.Errorf("no client")
 	}
@@ -52,7 +53,7 @@ func UrlTest(client *http.Client, link string, timeout int32) (int32, error) {
 	return int32(time.Since(time_start).Milliseconds() / int64(rtt_times)), nil
 }
 
-func TcpPing(address string, timeout int32) (ms int32, err error) {
+func tcpPing(address string, timeout int32) (ms int32, err error) {
 	startTime := time.Now()
 	c, err := net.DialTimeout("tcp", address, time.Duration(timeout)*time.Millisecond)
 	endTime := time.Now()
@@ -61,4 +62,24 @@ func TcpPing(address string, timeout int32) (ms int32, err error) {
 		c.Close()
 	}
 	return
+}
+
+func GetTest(InPort string, Destination string) (int32, error) {
+	proxyUrl, err := url.Parse("http://127.0.0.1:" + InPort)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	client := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}
+
+	link := Destination
+	timeout := int32(50000) // timeout in milliseconds
+	rtt, testerr := urlTest(client, link, timeout)
+	if testerr != nil {
+		fmt.Println("Error:", testerr)
+		return 0, testerr
+	} else {
+		fmt.Println("RTT:", rtt, "ms")
+		return rtt, nil
+	}
+
 }
