@@ -24,6 +24,7 @@ var inb = MixedInbound{
 func Configbuilder(Rawurl *string, InPort int) ([]byte, error) {
 	if InPort == 0 {
 		InPort = 8081
+	} else {
 		inb.ListenPort = InPort
 	}
 	var outbound _Outbound
@@ -45,6 +46,6 @@ func Configbuilder(Rawurl *string, InPort int) ([]byte, error) {
 		fmt.Println(err)
 		return nil, err
 	}
-	fmt.Println(string(configJson))
+
 	return json.RawMessage(configJson), nil
 }

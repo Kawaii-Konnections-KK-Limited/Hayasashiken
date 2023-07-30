@@ -2,3 +2,5 @@
 tester
 testsite/**
 testsite/
+db.sqlite3
+test.db

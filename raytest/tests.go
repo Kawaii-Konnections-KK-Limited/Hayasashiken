@@ -2,6 +2,7 @@ package raytest
 
 import (
 	"context"
+	"crypto/tls"
 
 	"fmt"
 	"math/rand"
@@ -69,7 +70,10 @@ func GetTest(InPort string, Destination string) (int32, error) {
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
-	client := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}
+	client := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl), TLSClientConfig: &tls.Config{
+		InsecureSkipVerify: true,
+	}},
+	}
 
 	link := Destination
 	timeout := int32(50000) // timeout in milliseconds
