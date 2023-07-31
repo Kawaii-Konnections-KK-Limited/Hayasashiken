@@ -86,6 +86,7 @@ func (h Config) MarshalJSON() ([]byte, error) {
 	t["inbounds"] = json.RawMessage(inb)
 	t["outbounds"] = json.RawMessage(otb)
 	t["route"] = h.Route
+	t["log"] = h.Log
 
 	return json.Marshal(t)
 

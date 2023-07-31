@@ -13,6 +13,7 @@ import (
 func SingByLink(Rawurl *string, Testurl string, InputPort int) (int32, error) {
 
 	c, err := configs.Configbuilder(Rawurl, InputPort)
+
 	if err != nil {
 		fmt.Println(err)
 		return 0, err

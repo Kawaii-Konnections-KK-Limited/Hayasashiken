@@ -132,9 +132,10 @@ func parseVlessUrl(rawURL *string) (VLESSConfig, error) {
 	}
 	if security := q.Get("security"); security != "" {
 		if security == "reality" {
+			config.TLS.Enabled = true
 			config.TLS.Reality.Enabled = true
-			config.TLS.Reality.PublicKey = q.Get("publicKey")
-			config.TLS.Reality.ShortID = q.Get("shortId")
+			config.TLS.Reality.PublicKey = q.Get("pbk")
+			config.TLS.Reality.ShortID = q.Get("sid")
 		}
 	}
 	if fingerprint := q.Get("fp"); fingerprint != "" {

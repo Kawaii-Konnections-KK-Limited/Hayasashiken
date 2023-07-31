@@ -82,7 +82,6 @@ func GetTest(InPort string, Destination string) (int32, error) {
 		fmt.Println("Error:", testerr)
 		return 0, testerr
 	} else {
-		fmt.Println("RTT:", rtt, "ms")
 		return rtt, nil
 	}
 

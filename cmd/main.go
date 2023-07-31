@@ -26,6 +26,11 @@ func init() {
 	}()
 }
 
+type Pair struct {
+	Ping int32
+	Link string
+}
+
 // func main() {
 // 	fmt.Println(os.Args)
 // 	if len(os.Args) < 3 {
@@ -39,16 +44,26 @@ func init() {
 func main() {
 	var wg sync.WaitGroup
 	res, _ := models.GetAllRecords()
-	fmt.Println(len(res))
-	for i, v := range res[4:5] {
+	var pairs []Pair
+
+	// var pings []int32
+	for i, v := range res {
+		link := v.Link
 		wg.Add(1)
 		port := i + 50000
 		go func(link *string, port int) {
 			defer wg.Done()
 
-			_, err := run.SingByLink(link, "https://claude.ai", port)
-			fmt.Println(err)
-		}(&v.Link, port)
+			r, _ := run.SingByLink(link, "http://cp.cloudflare.com/", port)
+			pairs = append(pairs, Pair{
+				Ping: r,
+				Link: *link,
+			})
+		}(&link, port)
 	}
 	wg.Wait()
+	for _, k := range pairs {
+		fmt.Printf("link: %s RTT: %d \n", k.Link, k.Ping)
+	}
+
 }

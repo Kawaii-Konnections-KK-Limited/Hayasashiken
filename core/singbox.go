@@ -71,7 +71,7 @@ func createByLink(wg *sync.WaitGroup, config *[]byte) (*box.Box, context.CancelF
 		cancel()
 		return nil, nil, E.Cause(err, "create service")
 	}
-	wg.Done()
+	defer wg.Done()
 	osSignals := make(chan os.Signal, 1)
 	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
 	defer func() {

@@ -5,28 +5,32 @@ import (
 	"fmt"
 )
 
-var inb = MixedInbound{
-	Type:                        "mixed",
-	Tag:                         "mixed-in",
-	Listen:                      "127.0.0.1",
-	ListenPort:                  8081,
-	TCPFastOpen:                 false,
-	UDPFragment:                 false,
-	Sniff:                       false,
-	SniffOverrideDestination:    false,
-	SniffTimeout:                "300ms",
-	UDPTimeout:                  300,
-	ProxyProtocol:               false,
-	ProxyProtocolAcceptNoHeader: false,
-	SetSystemProxy:              false,
-}
-
 func Configbuilder(Rawurl *string, InPort int) ([]byte, error) {
+
+	var inb = MixedInbound{
+		Type:                        "mixed",
+		Tag:                         "mixed-in",
+		Listen:                      "127.0.0.1",
+		ListenPort:                  8081,
+		TCPFastOpen:                 false,
+		UDPFragment:                 false,
+		Sniff:                       false,
+		SniffOverrideDestination:    false,
+		SniffTimeout:                "300ms",
+		UDPTimeout:                  300,
+		ProxyProtocol:               false,
+		ProxyProtocolAcceptNoHeader: false,
+		SetSystemProxy:              false,
+	}
+	var logs = log{
+		Disabled: true,
+	}
 	if InPort == 0 {
 		InPort = 8081
 	} else {
 		inb.ListenPort = InPort
 	}
+
 	var outbound _Outbound
 	c, err := parseUrl(Rawurl)
 	if err != nil {
@@ -40,6 +44,7 @@ func Configbuilder(Rawurl *string, InPort int) ([]byte, error) {
 		Inbounds:  inbound,
 		Outbounds: outbound,
 		Route:     nil,
+		Log:       logs,
 	}
 	configJson, err := config.MarshalJSON()
 	if err != nil {

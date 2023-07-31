@@ -145,10 +145,17 @@ type MixedInbound struct {
 type Route interface{}
 type _Outbound []any
 type _Inbound []any
+type log struct {
+	Disabled  bool   `json:"disabled"`
+	Level     string `json:"level"`
+	Output    string `json:"output"`
+	Timestamp bool   `json:"timestamp"`
+}
 type Config struct {
 	Inbounds  _Inbound  `json:"inbounds"`
 	Outbounds _Outbound `json:"outbounds"`
 	Route     Route     `json:"route"`
+	Log       log       `json:"log"`
 }
 type ConfigTypes struct {
 	Vless  VLESSConfig  `json:"vless"`
