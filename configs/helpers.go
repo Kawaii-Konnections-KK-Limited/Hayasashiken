@@ -35,7 +35,12 @@ func networkType(network *string, q *StringStringMap) (any, string) {
 		}, "udp"
 
 	case "tcp":
-		return nil, "tcp"
+		return TCPConfig{
+			Type:    "http",
+			Path:    q.Get("path"),
+			Headers: map[string][]string{"Host": {q.Get("host")}},
+			Method:  "GET",
+		}, "tcp"
 	case "udp":
 		return nil, "udp"
 	default:

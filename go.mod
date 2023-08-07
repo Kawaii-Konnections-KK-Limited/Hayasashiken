@@ -3,6 +3,14 @@ module github.com/uussoop/v2ray_test
 go 1.19
 
 require (
+	github.com/sagernet/sing v0.2.7
+	github.com/sagernet/sing-box v1.3.0
+	gorm.io/driver/sqlite v1.5.2
+	gorm.io/gorm v1.25.2
+)
+
+require (
+	berty.tech/go-libtor v1.0.385 // indirect
 	github.com/Dreamacro/clash v1.16.0 // indirect
 	github.com/Dreamacro/protobytes v0.0.0-20230324064118-87bc784139cd // indirect
 	github.com/ajg/form v1.5.1 // indirect
@@ -22,7 +30,6 @@ require (
 	github.com/google/btree v1.1.2 // indirect
 	github.com/google/pprof v0.0.0-20210407192527-94a9f03dee38 // indirect
 	github.com/hashicorp/yamux v0.1.1 // indirect
-	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20230612134759-b20c9ba983df // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
@@ -35,7 +42,9 @@ require (
 	github.com/mholt/acmez v1.2.0 // indirect
 	github.com/miekg/dns v1.1.55 // indirect
 	github.com/onsi/ginkgo/v2 v2.2.0 // indirect
+	github.com/ooni/go-libtor v1.1.8 // indirect
 	github.com/oschwald/maxminddb-golang v1.11.0 // indirect
+	github.com/pierrec/lz4/v4 v4.1.14 // indirect
 	github.com/pires/go-proxyproto v0.7.0 // indirect
 	github.com/quic-go/qpack v0.4.0 // indirect
 	github.com/quic-go/qtls-go1-18 v0.2.0 // indirect
@@ -47,8 +56,6 @@ require (
 	github.com/sagernet/netlink v0.0.0-20220905062125-8043b4a9aa97 // indirect
 	github.com/sagernet/quic-go v0.0.0-20230615020047-10f05c797c02 // indirect
 	github.com/sagernet/reality v0.0.0-20230406110435-ee17307e7691 // indirect
-	github.com/sagernet/sing v0.2.7 // indirect
-	github.com/sagernet/sing-box v1.3.0 // indirect
 	github.com/sagernet/sing-dns v0.1.6 // indirect
 	github.com/sagernet/sing-mux v0.1.0 // indirect
 	github.com/sagernet/sing-shadowsocks v0.2.2 // indirect
@@ -62,8 +69,6 @@ require (
 	github.com/sagernet/websocket v0.0.0-20220913015213-615516348b4e // indirect
 	github.com/sagernet/wireguard-go v0.0.0-20230420044414-a7bac1754e77 // indirect
 	github.com/scjalliance/comshim v0.0.0-20230315213746-5e51f40bd3b9 // indirect
-	github.com/spf13/cobra v1.7.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/u-root/uio v0.0.0-20230220225925-ffce2a382923 // indirect
 	github.com/vishvananda/netns v0.0.0-20211101163701-50045581ed74 // indirect
 	go.etcd.io/bbolt v1.3.7 // indirect
@@ -79,11 +84,8 @@ require (
 	golang.org/x/text v0.10.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.10.0 // indirect
-	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/grpc v1.56.1 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
-	gorm.io/driver/sqlite v1.5.2 // indirect
-	gorm.io/gorm v1.25.2 // indirect
 	lukechampine.com/blake3 v1.2.1 // indirect
 )

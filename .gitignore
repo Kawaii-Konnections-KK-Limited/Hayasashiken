@@ -4,3 +4,4 @@ testsite/**
 testsite/
 db.sqlite3
 test.db
+test-some/

@@ -3,6 +3,7 @@ package raytest
 import (
 	"context"
 	"crypto/tls"
+	"io"
 
 	"fmt"
 	"math/rand"
@@ -48,9 +49,12 @@ func urlTest(client *http.Client, link string, timeout int32) (int32, error) {
 		if err != nil {
 			return 0, err
 		}
+		body, err := io.ReadAll(resp.Body)
+		fmt.Println("string(body)")
+
+		fmt.Println(string(body))
 		resp.Body.Close()
 	}
-
 	return int32(time.Since(time_start).Milliseconds() / int64(rtt_times)), nil
 }
 

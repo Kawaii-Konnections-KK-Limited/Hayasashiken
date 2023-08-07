@@ -45,13 +45,20 @@ type VLESSConfig struct {
 
 // HTTP
 type HTTPConfig struct {
-	Type        string            `json:"type"`
-	Host        []string          `json:"host"`
-	Path        string            `json:"path"`
-	Method      string            `json:"method"`
-	Headers     map[string]string `json:"headers"`
-	IdleTimeout string            `json:"idle_timeout"`
-	PingTimeout string            `json:"ping_timeout"`
+	Type        string              `json:"type"`
+	Host        []string            `json:"host"`
+	Path        string              `json:"path"`
+	Method      string              `json:"method"`
+	Headers     map[string][]string `json:"headers"`
+	IdleTimeout string              `json:"idle_timeout"`
+	PingTimeout string              `json:"ping_timeout"`
+}
+type TCPConfig struct {
+	Type string `json:"type"`
+
+	Path    string              `json:"path"`
+	Method  string              `json:"method"`
+	Headers map[string][]string `json:"headers"`
 }
 
 // WebSocket

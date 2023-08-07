@@ -23,7 +23,7 @@ func Configbuilder(Rawurl *string, InPort int) ([]byte, error) {
 		SetSystemProxy:              false,
 	}
 	var logs = log{
-		Disabled: true,
+		Disabled: false,
 	}
 	if InPort == 0 {
 		InPort = 8081
@@ -51,6 +51,6 @@ func Configbuilder(Rawurl *string, InPort int) ([]byte, error) {
 		fmt.Println(err)
 		return nil, err
 	}
-
+	fmt.Println(string(configJson))
 	return json.RawMessage(configJson), nil
 }

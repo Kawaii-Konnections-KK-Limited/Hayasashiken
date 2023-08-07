@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"sync"
 
-	"github.com/uussoop/v2ray_test/models"
 	"github.com/uussoop/v2ray_test/run"
 )
 
@@ -31,39 +29,45 @@ type Pair struct {
 	Link string
 }
 
-// func main() {
-// 	fmt.Println(os.Args)
-// 	if len(os.Args) < 3 {
-// 		fmt.Println("config mode initiated by default, if you want to run by link use: ./v2ray_test link destinationlink")
-// 		run.RunByConfigFile()
-
-//		} else {
-//			run.SingByLink(&os.Args[1], os.Args[2])
-//		}
-//	}
 func main() {
-	var wg sync.WaitGroup
-	res, _ := models.GetAllRecords()
-	var pairs []Pair
+	fmt.Println(os.Args)
+	if len(os.Args) < 1 {
+		fmt.Println("config mode initiated by default, if you want to run by link use: ./v2ray_test link destinationlink")
+		run.RunByConfigFile()
 
-	// var pings []int32
-	for i, v := range res {
-		link := v.Link
-		wg.Add(1)
-		port := i + 50000
-		go func(link *string, port int) {
-			defer wg.Done()
-
-			r, _ := run.SingByLink(link, "http://cp.cloudflare.com/", port)
-			pairs = append(pairs, Pair{
-				Ping: r,
-				Link: *link,
-			})
-		}(&link, port)
+	} else {
+		// http://cp.cloudflare.com:80 https://icanhazip.com/
+		res, err := run.SingByLink(&os.Args[1], "https://icanhazip.com/", 50553)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(res)
 	}
-	wg.Wait()
-	for _, k := range pairs {
-		fmt.Printf("link: %s RTT: %d \n", k.Link, k.Ping)
-	}
-
 }
+
+// func main() {
+// 	var wg sync.WaitGroup
+// 	res, _ := models.GetAllRecords()
+// 	var pairs []Pair
+
+// 	// var pings []int32
+// 	for i, v := range res {
+// 		link := v.Link
+// 		wg.Add(1)
+// 		port := i + 50000
+// 		go func(link *string, port int) {
+// 			defer wg.Done()
+
+// 			r, _ := run.SingByLink(link, "http://cp.cloudflare.com/", port)
+// 			pairs = append(pairs, Pair{
+// 				Ping: r,
+// 				Link: *link,
+// 			})
+// 		}(&link, port)
+// 	}
+// 	wg.Wait()
+// 	for _, k := range pairs {
+// 		fmt.Printf("link: %s RTT: %d \n", k.Link, k.Ping)
+// 	}
+
+// }
