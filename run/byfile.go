@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/uussoop/v2ray_test/core"
-	"github.com/uussoop/v2ray_test/raytest"
+	"github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/core"
+	"github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/raytest"
 )
 
 func RunByConfigFile() (int32, error) {

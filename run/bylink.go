@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/uussoop/v2ray_test/configs"
-	"github.com/uussoop/v2ray_test/core"
-	"github.com/uussoop/v2ray_test/raytest"
+	"github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/configs"
+	"github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/core"
+	"github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/raytest"
 )
 
 func SingByLink(Rawurl *string, Testurl string, InputPort int) (int32, error) {

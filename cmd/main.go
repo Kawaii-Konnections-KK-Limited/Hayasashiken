@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/uussoop/v2ray_test/run"
+	"github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/run"
 )
 
 func init() {

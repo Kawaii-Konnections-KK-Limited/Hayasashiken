@@ -3,8 +3,8 @@ package foreignusage
 import (
 	"sync"
 
-	"github.com/uussoop/v2ray_test/models"
-	"github.com/uussoop/v2ray_test/run"
+	"github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/models"
+	"github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/run"
 )
 
 type Pair struct {

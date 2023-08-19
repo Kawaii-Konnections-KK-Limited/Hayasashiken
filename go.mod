@@ -1,4 +1,4 @@
-module github.com/uussoop/v2ray_test
+module github.com/Kawaii-Konnections-KK-Limited/Hayasashiken
 
 go 1.19
 
