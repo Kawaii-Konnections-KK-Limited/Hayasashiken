@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-
-	"github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/run"
 )
 
 func init() {
@@ -29,21 +27,21 @@ type Pair struct {
 	Link string
 }
 
-func main() {
-	fmt.Println(os.Args)
-	if len(os.Args) < 1 {
-		fmt.Println("config mode initiated by default, if you want to run by link use: ./v2ray_test link destinationlink")
-		run.RunByConfigFile()
+// func main() {
+// 	fmt.Println(os.Args)
+// 	if len(os.Args) < 1 {
+// 		fmt.Println("config mode initiated by default, if you want to run by link use: ./v2ray_test link destinationlink")
+// 		run.RunByConfigFile()
 
-	} else {
-		// http://cp.cloudflare.com:80 https://icanhazip.com/
-		res, err := run.SingByLink(&os.Args[1], "https://icanhazip.com/", 50553)
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Println(res)
-	}
-}
+// 	} else {
+// 		// http://cp.cloudflare.com:80 https://icanhazip.com/
+// 		res, err := run.SingByLink(&os.Args[1], "https://icanhazip.com/", 50553)
+// 		if err != nil {
+// 			fmt.Println(err)
+// 		}
+// 		fmt.Println(res)
+// 	}
+// }
 
 // func main() {
 // 	var wg sync.WaitGroup
@@ -69,5 +67,27 @@ func main() {
 // 	for _, k := range pairs {
 // 		fmt.Printf("link: %s RTT: %d \n", k.Link, k.Ping)
 // 	}
+
+// }
+
+// func main() {
+// 	var wg sync.WaitGroup
+
+// 	var pairs []string
+// 	var ports []int
+// 	// var pings []int32
+// 	for i, v := range pairs {
+// 		link := v
+// 		wg.Add(1)
+// 		port := i + 50000
+// 		go func(link *string, port int) {
+// 			defer wg.Done()
+
+// 			r, _ := run.SingByLink(link, "http://cp.cloudflare.com/", port)
+// 			if
+// 		}(&link, port)
+// 	}
+
+// 	wg.Wait()
 
 // }
