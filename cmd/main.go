@@ -78,7 +78,10 @@ func main() {
 	pairs := cmdUtils.ReadLinksFromFile("path to file")
 	var ports []int
 	var pp []int32
-	// var pings []int32
+	var testurl = "https://icanhazip.com/"
+	var timeout int32 = 5000
+	var baseBroadcast = ""
+
 	for i, v := range pairs {
 		link := v
 
@@ -86,7 +89,7 @@ func main() {
 
 		go func(link *string, port int) {
 
-			r, _ := run.SingByLinkProxy(link, "https://icanhazip.com/", port, 5000, "")
+			r, _ := run.SingByLinkProxy(link, &testurl, &port, &timeout, &baseBroadcast)
 			fmt.Println(r)
 			pp = append(pp, r)
 			if r < 1000 {

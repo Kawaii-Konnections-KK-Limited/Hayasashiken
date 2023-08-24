@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"io"
+	"strconv"
 
 	"fmt"
 	"math/rand"
@@ -14,7 +15,7 @@ import (
 	"time"
 )
 
-func urlTest(client *http.Client, link string, timeout int32) (int32, error) {
+func urlTest(client *http.Client, link *string, timeout *int32) (int32, error) {
 	if client == nil {
 		return 0, fmt.Errorf("no client")
 	}
@@ -25,16 +26,16 @@ func urlTest(client *http.Client, link string, timeout int32) (int32, error) {
 	var rtt_times = 1
 
 	// Test RTT "true delay"
-	if link2 := strings.TrimLeft(link, "true"); link != link2 {
-		link = link2
+	if link2 := strings.TrimLeft(*link, "true"); *link != link2 {
+		*link = link2
 		times = 3
 		rtt_times = 2
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*timeout)*time.Millisecond)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, "GET", link, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", *link, nil)
 	req.Header.Set("User-Agent", fmt.Sprintf("curl/7.%d.%d", rand.Int()%84, rand.Int()%2))
 	if err != nil {
 		return 0, err
@@ -69,8 +70,8 @@ func tcpPing(address string, timeout int32) (ms int32, err error) {
 	return
 }
 
-func GetTest(InPort string, Destination string, TimeOut int32) (int32, error) {
-	proxyUrl, err := url.Parse("http://127.0.0.1:" + InPort)
+func GetTest(InPort *int, Destination *string, TimeOut *int32) (int32, error) {
+	proxyUrl, err := url.Parse("http://127.0.0.1:" + strconv.Itoa(*InPort))
 	if err != nil {
 		fmt.Println("Error:", err)
 	}

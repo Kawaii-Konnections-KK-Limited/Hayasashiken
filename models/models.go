@@ -28,3 +28,7 @@ type Links struct {
 	ChannelID int
 	Link      string
 }
+type LinksSsimplified struct {
+	ID   int
+	Link string
+}

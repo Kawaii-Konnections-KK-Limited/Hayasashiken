@@ -2,7 +2,6 @@ package run
 
 import (
 	"fmt"
-	"strconv"
 	"sync"
 	"time"
 
@@ -11,7 +10,7 @@ import (
 	"github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/raytest"
 )
 
-func SingByLink(Rawurl *string, Testurl string, InputPort int, TimeOut int32, InIp string) (int32, error) {
+func SingByLink(Rawurl *string, Testurl *string, InputPort *int, TimeOut *int32, InIp *string) (int32, error) {
 
 	c, err := configs.Configbuilder(Rawurl, InputPort, InIp)
 
@@ -24,7 +23,7 @@ func SingByLink(Rawurl *string, Testurl string, InputPort int, TimeOut int32, In
 
 	go core.RunByLink(&wg, &c)
 	wg.Wait()
-	res, err := raytest.GetTest(strconv.Itoa(InputPort), Testurl, TimeOut)
+	res, err := raytest.GetTest(InputPort, Testurl, TimeOut)
 	if err != nil {
 		fmt.Println(err)
 		return 0, err
@@ -32,7 +31,7 @@ func SingByLink(Rawurl *string, Testurl string, InputPort int, TimeOut int32, In
 	return res, nil
 
 }
-func SingByLinkProxy(Rawurl *string, Testurl string, InputPort int, TimeOut int32, InIp string) (int32, error) {
+func SingByLinkProxy(Rawurl *string, Testurl *string, InputPort *int, TimeOut *int32, InIp *string) (int32, error) {
 
 	c, err := configs.Configbuilder(Rawurl, InputPort, InIp)
 
@@ -54,7 +53,7 @@ func SingByLinkProxy(Rawurl *string, Testurl string, InputPort int, TimeOut int3
 		}
 	}
 	// wg.Wait()
-	res, err := raytest.GetTest(strconv.Itoa(InputPort), Testurl, TimeOut)
+	res, err := raytest.GetTest(InputPort, Testurl, TimeOut)
 	if err != nil {
 		fmt.Println(err)
 		return 0, err
