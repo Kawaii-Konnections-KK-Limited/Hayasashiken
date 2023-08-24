@@ -48,6 +48,82 @@ func RunByLink(wg *sync.WaitGroup, config *[]byte) error {
 		}
 	}
 }
+func RunByLinkProxy(r *chan bool, config *[]byte) error {
+	osSignals := make(chan os.Signal, 1)
+	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
+	defer signal.Stop(osSignals)
+	for {
+		instance, cancel, err := createByLinkProxy(config)
+		if err != nil {
+			fmt.Println(err)
+		}
+		*r <- true
+		for {
+			osSignal := <-osSignals
+			if osSignal == syscall.SIGINT {
+				cancel()
+				closeCtx, closed := context.WithCancel(context.Background())
+				go closeMonitor(closeCtx)
+				instance.Close()
+				closed()
+
+			} else {
+				if err != nil {
+					log.Error(E.Cause(err, "reload service"))
+					continue
+				}
+			}
+			if osSignal != syscall.SIGHUP {
+				return nil
+			}
+			break
+		}
+	}
+}
+func createByLinkProxy(config *[]byte) (*box.Box, context.CancelFunc, error) {
+
+	var options option.Options
+	err := options.UnmarshalJSON(*config)
+
+	if err != nil {
+		return nil, nil, err
+	}
+	if disableColor {
+		if options.Log == nil {
+			options.Log = &option.LogOptions{}
+		}
+		options.Log.DisableColor = true
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	instance, err := box.New(box.Options{
+		Context: ctx,
+		Options: options,
+	})
+	if err != nil {
+		cancel()
+		return nil, nil, E.Cause(err, "create service")
+	}
+	osSignals := make(chan os.Signal, 1)
+	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
+
+	defer func() {
+		signal.Stop(osSignals)
+		close(osSignals)
+	}()
+
+	go func() {
+		_, loaded := <-osSignals
+		if loaded {
+			cancel()
+		}
+	}()
+	err = instance.Start()
+	if err != nil {
+		cancel()
+		return nil, nil, E.Cause(err, "start service")
+	}
+	return instance, cancel, nil
+}
 func createByLink(wg *sync.WaitGroup, config *[]byte) (*box.Box, context.CancelFunc, error) {
 
 	var options option.Options
@@ -71,9 +147,9 @@ func createByLink(wg *sync.WaitGroup, config *[]byte) (*box.Box, context.CancelF
 		cancel()
 		return nil, nil, E.Cause(err, "create service")
 	}
-	defer wg.Done()
 	osSignals := make(chan os.Signal, 1)
 	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
+	defer wg.Done()
 	defer func() {
 		signal.Stop(osSignals)
 		close(osSignals)

@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+
+	cmdUtils "github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/cmd/utils"
+	"github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/run"
 )
 
 func init() {
@@ -15,7 +18,7 @@ func init() {
 
 		<-sigCh
 
-		fmt.Println("Received SIGINT signal")
+		fmt.Println("Received SIGTERM signal")
 
 		cancel() // Cancel the context when SIGINT is received
 
@@ -70,24 +73,39 @@ type Pair struct {
 
 // }
 
-// func main() {
-// 	var wg sync.WaitGroup
+func main() {
 
-// 	var pairs []string
-// 	var ports []int
-// 	// var pings []int32
-// 	for i, v := range pairs {
-// 		link := v
-// 		wg.Add(1)
-// 		port := i + 50000
-// 		go func(link *string, port int) {
-// 			defer wg.Done()
+	pairs := cmdUtils.ReadLinksFromFile("path to file")
+	var ports []int
+	var pp []int32
+	// var pings []int32
+	for i, v := range pairs {
+		link := v
 
-// 			r, _ := run.SingByLink(link, "http://cp.cloudflare.com/", port)
-// 			if
-// 		}(&link, port)
-// 	}
+		port := i + 50000
 
-// 	wg.Wait()
+		go func(link *string, port int) {
 
-// }
+			r, _ := run.SingByLinkProxy(link, "https://icanhazip.com/", port, 5000, "")
+			fmt.Println(r)
+			pp = append(pp, r)
+			if r < 1000 {
+				if r != 0 {
+					ports = append(ports, port)
+				}
+			}
+
+		}(&link, port)
+	}
+	returned := false
+	for {
+
+		if len(ports) > 0 && !returned && len(pairs) == len(pp) {
+
+			fmt.Println(ports)
+			returned = true
+		}
+
+	}
+
+}

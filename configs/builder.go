@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func Configbuilder(Rawurl *string, InPort int) ([]byte, error) {
+func Configbuilder(Rawurl *string, InPort int, InIp string) ([]byte, error) {
 
 	var inb = MixedInbound{
 		Type:                        "mixed",
@@ -23,12 +23,15 @@ func Configbuilder(Rawurl *string, InPort int) ([]byte, error) {
 		SetSystemProxy:              false,
 	}
 	var logs = log{
-		Disabled: false,
+		Disabled: true,
 	}
 	if InPort == 0 {
 		InPort = 8081
 	} else {
 		inb.ListenPort = InPort
+	}
+	if InIp != "" {
+		inb.Listen = InIp
 	}
 
 	var outbound _Outbound

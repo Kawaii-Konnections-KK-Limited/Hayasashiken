@@ -26,7 +26,7 @@ func GetTestResults(links *[]models.Links) []Pair {
 		go func(link *string, port int, i int) {
 			defer wg.Done()
 
-			r, _ := run.SingByLink(link, "http://cp.cloudflare.com/", port)
+			r, _ := run.SingByLink(link, "http://cp.cloudflare.com/", port, 5000, "")
 			pairs = append(pairs, Pair{
 				Ping: r,
 				Link: *link,

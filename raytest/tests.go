@@ -69,7 +69,7 @@ func tcpPing(address string, timeout int32) (ms int32, err error) {
 	return
 }
 
-func GetTest(InPort string, Destination string) (int32, error) {
+func GetTest(InPort string, Destination string, TimeOut int32) (int32, error) {
 	proxyUrl, err := url.Parse("http://127.0.0.1:" + InPort)
 	if err != nil {
 		fmt.Println("Error:", err)
@@ -80,8 +80,8 @@ func GetTest(InPort string, Destination string) (int32, error) {
 	}
 
 	link := Destination
-	timeout := int32(50000) // timeout in milliseconds
-	rtt, testerr := urlTest(client, link, timeout)
+	// timeout := int32(5000) // timeout in milliseconds
+	rtt, testerr := urlTest(client, link, TimeOut)
 	if testerr != nil {
 		fmt.Println("Error:", testerr)
 		return 0, testerr
