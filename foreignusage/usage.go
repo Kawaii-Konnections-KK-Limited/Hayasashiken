@@ -13,7 +13,7 @@ type Pair struct {
 	Link string
 }
 
-func GetTestResults(links *[]models.LinksSsimplified, t *int32, upperBoundPingLimit *int32, TestUrl *string) []Pair {
+func GetTestResults(links *[]models.LinksSsimplified, timeout *int32, upperBoundPingLimit *int32, TestUrl *string) []Pair {
 	var wg sync.WaitGroup
 
 	var pairs []Pair
@@ -27,7 +27,7 @@ func GetTestResults(links *[]models.LinksSsimplified, t *int32, upperBoundPingLi
 		go func(link *string, port int, i int) {
 			defer wg.Done()
 
-			r, _ := run.SingByLink(link, TestUrl, &port, t, &baseBroadcast)
+			r, _ := run.SingByLink(link, TestUrl, &port, timeout, &baseBroadcast)
 			if r > 10 && r < *upperBoundPingLimit {
 				pairs = append(pairs, Pair{
 					Ping: r,

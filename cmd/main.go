@@ -5,25 +5,26 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"syscall"
 
 	cmdUtils "github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/cmd/utils"
 	"github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/run"
 )
 
-func init() {
-	_, cancel := context.WithCancel(context.Background())
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, os.Interrupt)
-	go func() {
+// func init() {
+// 	_, cancel := context.WithCancel(context.Background())
+// 	sigCh := make(chan os.Signal, 1)
+// 	signal.Notify(sigCh, syscall.SIGINT)
+// 	go func() {
 
-		<-sigCh
+// 		<-sigCh
 
-		fmt.Println("Received SIGTERM signal")
+// 		fmt.Println("Received SIGTERM signal")
 
-		cancel() // Cancel the context when SIGINT is received
+// 		cancel() // Cancel the context when SIGINT is received
 
-	}()
-}
+// 	}()
+// }
 
 type Pair struct {
 	Ping int32
@@ -72,43 +73,75 @@ type Pair struct {
 // 	}
 
 // }
+var testurl = "https://icanhazip.com/"
+var timeout int32 = 2000
+var baseBroadcast = "127.0.0.1"
+var upperBoundPingLimit int32 = 2000
+var ports []int
 
 func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT)
+	go func() {
 
-	pairs := cmdUtils.ReadLinksFromFile("path to file")
-	var ports []int
-	var pp []int32
-	var testurl = "https://icanhazip.com/"
-	var timeout int32 = 5000
-	var baseBroadcast = ""
+		<-sigCh
 
+		fmt.Println("Received sigint signal")
+
+		cancel() // Cancel the context when SIGINT is received
+
+	}()
+
+	pairs := cmdUtils.ReadLinksFromFile("cmd/links.txt")
+	// var pp []int32
+
+	var counts int = 0
 	for i, v := range pairs {
+		kills := make(chan bool, 1)
 		link := v
-
 		port := i + 50000
 
-		go func(link *string, port int) {
-
-			r, _ := run.SingByLinkProxy(link, &testurl, &port, &timeout, &baseBroadcast)
-			fmt.Println(r)
-			pp = append(pp, r)
-			if r < 1000 {
-				if r != 0 {
-					ports = append(ports, port)
-				}
-			}
-
-		}(&link, port)
+		go start(&link, port, ctx, &kills, &counts)
 	}
 	returned := false
 	for {
+		select {
+		case <-ctx.Done():
+			fmt.Println("Context is done")
+			return
+		default:
 
-		if len(ports) > 0 && !returned && len(pairs) == len(pp) {
+			if !returned && len(pairs) == counts {
 
-			fmt.Println(ports)
-			returned = true
+				fmt.Println(ports)
+				returned = true
+			}
+
+			if returned && len(ports) == 0 {
+				fmt.Println("all tested nothing works")
+				return
+			}
+
 		}
 
 	}
+
+}
+func start(link *string, port int, ctx context.Context, kills *chan bool, counts *int) {
+
+	r, _ := run.SingByLinkProxy(link, &testurl, &port, &timeout, &baseBroadcast, ctx, kills)
+
+	fmt.Println(r)
+	fmt.Println(*counts)
+	if r < upperBoundPingLimit && r != 0 {
+
+		ports = append(ports, port)
+
+	} else {
+
+		*kills <- true
+	}
+	*counts++
 
 }

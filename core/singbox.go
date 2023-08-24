@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -48,31 +49,81 @@ func RunByLink(wg *sync.WaitGroup, config *[]byte) error {
 		}
 	}
 }
-func RunByLinkProxy(r *chan bool, config *[]byte) error {
+func RunByLinkProxy(r *chan bool, config *[]byte, ctx context.Context, kills *chan bool, failed *chan bool) error {
 	osSignals := make(chan os.Signal, 1)
-	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
+	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGINT)
 	defer signal.Stop(osSignals)
 	for {
 		instance, cancel, err := createByLinkProxy(config)
 		if err != nil {
-			fmt.Println(err)
+			*r <- true
+			*failed <- true
+			return err
+		}
+		if cancel == nil {
+			//return new error
+			*r <- true
+			*failed <- true
+			return errors.New("cancel is nil")
+		}
+		if instance == nil {
+			//return new error
+			*r <- true
+			*failed <- true
+			return errors.New("instance is nil")
 		}
 		*r <- true
+
 		for {
+			fmt.Println(<-*kills)
 			osSignal := <-osSignals
-			if osSignal == syscall.SIGINT {
+
+			select {
+			case <-ctx.Done():
+				// exit gracefully
+				fmt.Println("Context is done3")
+
 				cancel()
-				closeCtx, closed := context.WithCancel(context.Background())
+
+				closeCtx, closed := context.WithCancel(ctx)
 				go closeMonitor(closeCtx)
+
 				instance.Close()
+
 				closed()
 
-			} else {
-				if err != nil {
-					log.Error(E.Cause(err, "reload service"))
-					continue
+			case <-*kills:
+
+				k := <-*kills
+				if k {
+					fmt.Println("kill")
+					closeCtx, closed := context.WithCancel(ctx)
+					go closeMonitor(closeCtx)
+
+					cancel()
+
+					instance.Close()
+
+					closed()
+					return nil
 				}
+			default:
+
 			}
+			// if osSignal == syscall.SIGINT {
+			// 	fmt.Println("Context is done3")
+			// 	cancel()
+			// 	closeCtx, closed := context.WithCancel(ctx)
+			// 	go closeMonitor(closeCtx)
+			// 	instance.Close()
+			// 	closed()
+
+			// } else {
+			// 	if err != nil {
+			// 		log.Error(E.Cause(err, "reload service"))
+			// 		continue
+			// 	}
+			// }
 			if osSignal != syscall.SIGHUP {
 				return nil
 			}

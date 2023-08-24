@@ -54,6 +54,5 @@ func Configbuilder(Rawurl *string, InPort *int, InIp *string) ([]byte, error) {
 		fmt.Println(err)
 		return nil, err
 	}
-	fmt.Println(string(configJson))
 	return json.RawMessage(configJson), nil
 }

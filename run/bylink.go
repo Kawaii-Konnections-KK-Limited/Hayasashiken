@@ -1,6 +1,7 @@
 package run
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -31,7 +32,7 @@ func SingByLink(Rawurl *string, Testurl *string, InputPort *int, TimeOut *int32,
 	return res, nil
 
 }
-func SingByLinkProxy(Rawurl *string, Testurl *string, InputPort *int, TimeOut *int32, InIp *string) (int32, error) {
+func SingByLinkProxy(Rawurl *string, Testurl *string, InputPort *int, TimeOut *int32, InIp *string, ctx context.Context, kills *chan bool) (int32, error) {
 
 	c, err := configs.Configbuilder(Rawurl, InputPort, InIp)
 
@@ -40,24 +41,45 @@ func SingByLinkProxy(Rawurl *string, Testurl *string, InputPort *int, TimeOut *i
 		return 0, err
 	}
 	instanceReady := make(chan bool, 1)
+	instanceFailed := make(chan bool, 1)
 
-	go core.RunByLinkProxy(&instanceReady, &c)
+	if ctx == nil || instanceReady == nil || c == nil {
+		fmt.Println("Context is nil")
+	}
+
+	go core.RunByLinkProxy(&instanceReady, &c, ctx, kills, &instanceFailed)
+	// wg.Wait()
 	for {
-		if <-instanceReady {
-			fmt.Println("Instance is ready")
-			break
-		} else {
 
-			fmt.Println("Instance is not ready")
-			time.Sleep(5 * time.Second)
+		select {
+		case <-ctx.Done():
+			fmt.Println("Context is done2")
+			return 0, nil
+
+		default:
+			select {
+			case <-instanceReady:
+
+				select {
+				case <-instanceFailed:
+					return 0, nil
+
+				default:
+					res, err := raytest.GetTest(InputPort, Testurl, TimeOut)
+					if err != nil {
+
+						return 0, err
+					}
+					return res, nil
+				}
+
+			default:
+
+				// fmt.Println("Instance is not ready")
+				time.Sleep(1 * time.Second)
+
+			}
 		}
 	}
-	// wg.Wait()
-	res, err := raytest.GetTest(InputPort, Testurl, TimeOut)
-	if err != nil {
-		fmt.Println(err)
-		return 0, err
-	}
-	return res, nil
 
 }
