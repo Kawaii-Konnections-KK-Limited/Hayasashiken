@@ -29,7 +29,7 @@ func GetTestResults(links *[]models.LinksSsimplified, timeout *int32, upperBound
 		go func(link *string, port int, i int) {
 			defer wg.Done()
 
-			r, _ := run.SingByLink(link, TestUrl, &port, timeout, &baseBroadcast, ctx, &kills)
+			r, _ := run.SingByLink(link, TestUrl, &port, timeout, &baseBroadcast, *ctx, &kills)
 			if r > 10 && r < *upperBoundPingLimit {
 				pairs = append(pairs, Pair{
 					Ping: r,

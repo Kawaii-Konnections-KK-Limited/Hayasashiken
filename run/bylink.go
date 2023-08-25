@@ -11,7 +11,7 @@ import (
 	"github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/raytest"
 )
 
-func SingByLink(Rawurl *string, Testurl *string, InputPort *int, TimeOut *int32, InIp *string, ctx *context.Context, kills *chan bool) (int32, error) {
+func SingByLink(Rawurl *string, Testurl *string, InputPort *int, TimeOut *int32, InIp *string, ctx context.Context, kills *chan bool) (int32, error) {
 
 	c, err := configs.Configbuilder(Rawurl, InputPort, InIp)
 
@@ -22,14 +22,24 @@ func SingByLink(Rawurl *string, Testurl *string, InputPort *int, TimeOut *int32,
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	go core.RunByLink(&wg, &c, *ctx, kills)
+	go core.RunByLink(&wg, &c, ctx, kills)
 	wg.Wait()
-	res, err := raytest.GetTest(InputPort, Testurl, TimeOut)
-	if err != nil {
-		fmt.Println(err)
-		return 0, err
+	for {
+		select {
+		case <-ctx.Done():
+
+			return 0, nil
+
+		default:
+			res, err := raytest.GetTest(InputPort, Testurl, TimeOut)
+			if err != nil {
+				fmt.Println(err)
+				return 0, err
+			}
+			return res, nil
+
+		}
 	}
-	return res, nil
 
 }
 func SingByLinkProxy(Rawurl *string, Testurl *string, InputPort *int, TimeOut *int32, InIp *string, ctx context.Context, kills *chan bool) (int32, error) {
