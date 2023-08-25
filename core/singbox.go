@@ -56,27 +56,29 @@ func RunByLinkProxy(r *chan bool, config *[]byte, ctx context.Context, kills *ch
 	for {
 		instance, cancel, err := createByLinkProxy(config)
 		if err != nil {
+
 			*r <- true
 			*failed <- true
 			return err
 		}
 		if cancel == nil {
 			//return new error
+
 			*r <- true
 			*failed <- true
 			return errors.New("cancel is nil")
 		}
 		if instance == nil {
+
 			//return new error
 			*r <- true
 			*failed <- true
 			return errors.New("instance is nil")
 		}
-		*r <- true
 
 		for {
-			fmt.Println(<-*kills)
-			osSignal := <-osSignals
+			*r <- true
+			// osSignal := <-osSignals
 
 			select {
 			case <-ctx.Done():
@@ -91,10 +93,10 @@ func RunByLinkProxy(r *chan bool, config *[]byte, ctx context.Context, kills *ch
 				instance.Close()
 
 				closed()
+				return nil
 
-			case <-*kills:
+			case k := <-*kills:
 
-				k := <-*kills
 				if k {
 					fmt.Println("kill")
 					closeCtx, closed := context.WithCancel(ctx)
@@ -105,11 +107,12 @@ func RunByLinkProxy(r *chan bool, config *[]byte, ctx context.Context, kills *ch
 					instance.Close()
 
 					closed()
+
 					return nil
 				}
-			default:
 
 			}
+
 			// if osSignal == syscall.SIGINT {
 			// 	fmt.Println("Context is done3")
 			// 	cancel()
@@ -124,12 +127,14 @@ func RunByLinkProxy(r *chan bool, config *[]byte, ctx context.Context, kills *ch
 			// 		continue
 			// 	}
 			// }
-			if osSignal != syscall.SIGHUP {
-				return nil
-			}
-			break
+			// if osSignal != syscall.SIGHUP {
+			// 	return nil
+			// }
+			// break
 		}
+
 	}
+
 }
 func createByLinkProxy(config *[]byte) (*box.Box, context.CancelFunc, error) {
 

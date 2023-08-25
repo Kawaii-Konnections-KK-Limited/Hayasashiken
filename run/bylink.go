@@ -70,12 +70,13 @@ func SingByLinkProxy(Rawurl *string, Testurl *string, InputPort *int, TimeOut *i
 
 						return 0, err
 					}
+
 					return res, nil
 				}
 
 			default:
 
-				// fmt.Println("Instance is not ready")
+				fmt.Println("Instance is not ready")
 				time.Sleep(1 * time.Second)
 
 			}
