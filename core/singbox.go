@@ -18,12 +18,13 @@ import (
 
 var disableColor bool
 
-func RunByLink(wg *sync.WaitGroup, config *[]byte) error {
+func RunByLinkDep(wg *sync.WaitGroup, config *[]byte) error {
 	osSignals := make(chan os.Signal, 1)
 	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
 	defer signal.Stop(osSignals)
 	for {
-		instance, cancel, err := createByLink(wg, config)
+		// wg,
+		instance, cancel, err := createByLink(config)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -46,6 +47,67 @@ func RunByLink(wg *sync.WaitGroup, config *[]byte) error {
 				return nil
 			}
 			break
+		}
+	}
+}
+func RunByLink(wg *sync.WaitGroup, config *[]byte, ctx context.Context, kills *chan bool) error {
+	osSignals := make(chan os.Signal, 1)
+	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
+	defer signal.Stop(osSignals)
+	for {
+		instance, cancel, err := createByLink(config)
+		if err != nil {
+
+			wg.Done()
+			return err
+		}
+		if cancel == nil {
+			//return new error
+			wg.Done()
+
+			return errors.New("cancel is nil")
+		}
+		if instance == nil {
+
+			//return new error
+			wg.Done()
+			return errors.New("instance is nil")
+		}
+
+		for {
+			wg.Done()
+			select {
+			case <-ctx.Done():
+				// exit gracefully
+				fmt.Println("Context is done3")
+
+				cancel()
+
+				closeCtx, closed := context.WithCancel(ctx)
+				go closeMonitor(closeCtx)
+
+				instance.Close()
+
+				closed()
+				return nil
+
+			case k := <-*kills:
+
+				if k {
+					fmt.Println("kill")
+					closeCtx, closed := context.WithCancel(ctx)
+					go closeMonitor(closeCtx)
+
+					cancel()
+
+					instance.Close()
+
+					closed()
+
+					return nil
+				}
+
+			}
 		}
 	}
 }
@@ -78,7 +140,6 @@ func RunByLinkProxy(r *chan bool, config *[]byte, ctx context.Context, kills *ch
 
 		for {
 			*r <- true
-			// osSignal := <-osSignals
 
 			select {
 			case <-ctx.Done():
@@ -113,24 +174,6 @@ func RunByLinkProxy(r *chan bool, config *[]byte, ctx context.Context, kills *ch
 
 			}
 
-			// if osSignal == syscall.SIGINT {
-			// 	fmt.Println("Context is done3")
-			// 	cancel()
-			// 	closeCtx, closed := context.WithCancel(ctx)
-			// 	go closeMonitor(closeCtx)
-			// 	instance.Close()
-			// 	closed()
-
-			// } else {
-			// 	if err != nil {
-			// 		log.Error(E.Cause(err, "reload service"))
-			// 		continue
-			// 	}
-			// }
-			// if osSignal != syscall.SIGHUP {
-			// 	return nil
-			// }
-			// break
 		}
 
 	}
@@ -180,7 +223,7 @@ func createByLinkProxy(config *[]byte) (*box.Box, context.CancelFunc, error) {
 	}
 	return instance, cancel, nil
 }
-func createByLink(wg *sync.WaitGroup, config *[]byte) (*box.Box, context.CancelFunc, error) {
+func createByLink(config *[]byte) (*box.Box, context.CancelFunc, error) {
 
 	var options option.Options
 	err := options.UnmarshalJSON(*config)
@@ -205,7 +248,7 @@ func createByLink(wg *sync.WaitGroup, config *[]byte) (*box.Box, context.CancelF
 	}
 	osSignals := make(chan os.Signal, 1)
 	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
-	defer wg.Done()
+
 	defer func() {
 		signal.Stop(osSignals)
 		close(osSignals)

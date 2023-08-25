@@ -129,7 +129,7 @@ func main() {
 }
 func start(link *string, port int, ctx context.Context, counts *int) {
 	kills := make(chan bool, 1)
-	defer close(kills)
+
 	r, _ := run.SingByLinkProxy(link, &testurl, &port, &timeout, &baseBroadcast, ctx, &kills)
 
 	if r < upperBoundPingLimit && r != 0 {
