@@ -33,7 +33,6 @@ func urlTest(client *http.Client, link *string, timeout *int32) (int32, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*timeout)*time.Millisecond)
 	defer cancel()
-
 	req, err := http.NewRequestWithContext(ctx, "GET", *link, nil)
 	req.Header.Set("User-Agent", fmt.Sprintf("curl/7.%d.%d", rand.Int()%84, rand.Int()%2))
 	if err != nil {
@@ -46,12 +45,15 @@ func urlTest(client *http.Client, link *string, timeout *int32) (int32, error) {
 		}
 
 		resp, err := client.Do(req)
+		fmt.Print()
 		if err != nil {
+
 			return 0, err
 		}
 
 		resp.Body.Close()
 	}
+
 	return int32(time.Since(time_start).Milliseconds() / int64(rtt_times)), nil
 }
 
@@ -71,9 +73,10 @@ func GetTest(InPort *int, Destination *string, TimeOut *int32) (int32, error) {
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
-	client := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl), TLSClientConfig: &tls.Config{
-		InsecureSkipVerify: true,
-	}},
+	client := &http.Client{Transport: &http.Transport{
+		Proxy: http.ProxyURL(proxyUrl), TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		}},
 	}
 
 	link := Destination

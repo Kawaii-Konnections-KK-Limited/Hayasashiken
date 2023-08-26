@@ -68,25 +68,29 @@ func SingByLinkProxy(Rawurl *string, Testurl *string, InputPort *int, TimeOut *i
 
 		default:
 			select {
-			case <-instanceReady:
+			case r := <-instanceReady:
+				if r {
+					select {
+					case f := <-instanceFailed:
+						if f {
 
-				select {
-				case <-instanceFailed:
-					return 0, nil
+							return 0, nil
+						}
 
-				default:
-					res, err := raytest.GetTest(InputPort, Testurl, TimeOut)
-					if err != nil {
+					default:
+						res, err := raytest.GetTest(InputPort, Testurl, TimeOut)
 
-						return 0, err
+						if err != nil {
+
+							return 0, err
+						}
+
+						return res, nil
 					}
-
-					return res, nil
 				}
 
 			default:
 
-				fmt.Println("Instance is not ready")
 				time.Sleep(1 * time.Second)
 
 			}

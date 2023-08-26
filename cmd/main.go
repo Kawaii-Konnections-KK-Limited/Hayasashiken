@@ -72,11 +72,11 @@ type Pair struct {
 // 		fmt.Printf("link: %s RTT: %d \n", k.Link, k.Ping)
 // 	}
 
-// }
-var testurl = "https://icanhazip.com/"
-var timeout int32 = 10000
-var baseBroadcast = "127.0.0.1"
-var upperBoundPingLimit int32 = 5000
+// }"http://cp.cloudflare.com/"
+var testurl = "https://www.google.com/"
+var timeout int32 = 4000
+var baseBroadcast = "0.0.0.0"
+var upperBoundPingLimit int32 = 3000
 var ports []int
 
 func main() {
@@ -110,7 +110,6 @@ func main() {
 			fmt.Println("Context is done")
 			return
 		default:
-
 			if !returned && len(pairs) == counts {
 
 				fmt.Println(ports)
@@ -133,14 +132,13 @@ func start(link *string, port int, ctx context.Context, counts *int) {
 	r, _ := run.SingByLinkProxy(link, &testurl, &port, &timeout, &baseBroadcast, ctx, &kills)
 
 	if r < upperBoundPingLimit && r != 0 {
-
+		*counts++
+		fmt.Println(r)
 		ports = append(ports, port)
 
 	} else {
 		kills <- true
-
+		*counts++
 	}
-
-	*counts++
 
 }

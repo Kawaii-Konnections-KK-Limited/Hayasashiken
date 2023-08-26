@@ -159,7 +159,7 @@ func RunByLinkProxy(r *chan bool, config *[]byte, ctx context.Context, kills *ch
 			case k := <-*kills:
 
 				if k {
-					fmt.Println("kill")
+
 					closeCtx, closed := context.WithCancel(ctx)
 					go closeMonitor(closeCtx)
 
