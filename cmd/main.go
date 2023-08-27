@@ -74,9 +74,9 @@ type Pair struct {
 
 // }"http://cp.cloudflare.com/"
 var testurl = "https://www.google.com/"
-var timeout int32 = 4000
+var timeout int32 = 10000
 var baseBroadcast = "0.0.0.0"
-var upperBoundPingLimit int32 = 3000
+var upperBoundPingLimit int32 = 5000
 var ports []int
 
 func main() {
