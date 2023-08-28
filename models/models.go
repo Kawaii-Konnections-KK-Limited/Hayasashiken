@@ -3,22 +3,21 @@ package models
 import (
 	"time"
 
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 var database_ *gorm.DB
 
-func init() {
+// func init() {
 
-	// Open database connection
-	db, err := gorm.Open(sqlite.Open("db.sqlite3"), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-	db.AutoMigrate(&Links{})
-	database_ = db
-}
+// 	// Open database connection
+// 	db, err := gorm.Open(sqlite.Open("db.sqlite3"), &gorm.Config{})
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	db.AutoMigrate(&Links{})
+// 	database_ = db
+// }
 
 type Links struct {
 	ID        int `gorm:"primaryKey"`
