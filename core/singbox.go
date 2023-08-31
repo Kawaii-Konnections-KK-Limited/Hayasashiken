@@ -76,6 +76,7 @@ func RunByLink(wg *sync.WaitGroup, config *[]byte, ctx context.Context, kills *c
 
 		for {
 			wg.Done()
+
 			select {
 			case <-ctx.Done():
 				// exit gracefully

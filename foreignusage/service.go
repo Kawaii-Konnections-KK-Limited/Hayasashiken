@@ -25,10 +25,29 @@ func InitService() {
 		fmt.Println("Defaulting to port ", port)
 
 	}
+	// srv := &http.Server{
+	// 	Addr:    ":" + port,
+	// 	Handler: initRouter(),
+	// }
 	err := initRouter().Run(":" + port)
+	// err := srv.ListenAndServe()
 	if err != nil {
 		return
 	}
+
+	// ctx, cancel := context.WithCancel(context.Background())
+
+	// var sigCh = make(chan os.Signal, 1)
+	// signal.Notify(sigCh, syscall.SIGINT)
+
+	// go func() {
+	// 	<-sigCh
+	// 	fmt.Println("cancel test")
+	// 	srv.Shutdown(ctx)
+	// 	cancel() // Cancel the context when SIGINT is received
+
+	// }()
+
 }
 func initRouter() *gin.Engine {
 	config := cors.DefaultConfig()
@@ -52,10 +71,10 @@ type link struct {
 	Link string `json:"link"`
 }
 type requestLinks struct {
-	Links               *[]link `json:"links"`
-	Timeout             *int32  `json:"timeout"`
-	UpperBoundPingLimit *int32  `json:"upperbound"`
-	TestUrl             *string `json:"testurl"`
+	Links               []link `json:"links"`
+	Timeout             int32  `json:"timeout"`
+	UpperBoundPingLimit int32  `json:"upperbound"`
+	TestUrl             string `json:"testurl"`
 }
 type responseLink struct {
 	ID   int    `json:"id"`
@@ -71,27 +90,40 @@ type responseError struct {
 }
 
 func testHandler(c *gin.Context) {
+
 	var r requestLinks
-	err := c.BindJSON(r)
+	err := c.BindJSON(&r)
 	ctx, cancel := context.WithCancel(context.Background())
-	sigCh := make(chan os.Signal, 1)
+
+	var sigCh = make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT)
+	done := make(chan bool)
 	go func() {
 
-		<-sigCh
+		select {
+		case <-done:
+			fmt.Println("test doneeee")
+			cancel()
+			return // cancel goroutine
+		case <-sigCh:
+			fmt.Println("cancel test")
 
-		fmt.Println("Received sigint signal")
-
-		cancel() // Cancel the context when SIGINT is received
+			cancel() // Cancel the context when SIGINT is received
+			// ...
+		}
 
 	}()
+
 	if err != nil {
-		c.JSON(http.StatusBadRequest, responseError{Status: http.StatusBadRequest, Message: "Invalid request."})
+		c.JSON(http.StatusBadRequest, responseError{Status: http.StatusBadRequest, Message: fmt.Sprint(err)})
 		return
 	}
-	if c.GetHeader("Authorization") == os.Getenv("auth") {
-		res := getTestResultsAsService(r.Links, r.Timeout, r.UpperBoundPingLimit, r.TestUrl, &ctx)
+	// os.Getenv("auth")
+	if c.GetHeader("Authorization") == "1" {
+		res := getTestResultsAsService(&r.Links, &r.Timeout, &r.UpperBoundPingLimit, &r.TestUrl, &ctx)
 		c.JSON(http.StatusBadRequest, responseLinks{Links: res})
+		done <- true
+		c.Abort()
 	} else {
 		c.JSON(http.StatusBadRequest, responseError{Status: http.StatusForbidden, Message: "request unauthorized."})
 
