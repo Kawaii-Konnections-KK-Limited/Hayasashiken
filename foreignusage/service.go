@@ -5,9 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os/signal"
 	"sync"
-	"syscall"
 
 	"os"
 
@@ -25,28 +23,12 @@ func InitService() {
 		fmt.Println("Defaulting to port ", port)
 
 	}
-	// srv := &http.Server{
-	// 	Addr:    ":" + port,
-	// 	Handler: initRouter(),
-	// }
+
 	err := initRouter().Run(":" + port)
-	// err := srv.ListenAndServe()
+
 	if err != nil {
 		return
 	}
-
-	// ctx, cancel := context.WithCancel(context.Background())
-
-	// var sigCh = make(chan os.Signal, 1)
-	// signal.Notify(sigCh, syscall.SIGINT)
-
-	// go func() {
-	// 	<-sigCh
-	// 	fmt.Println("cancel test")
-	// 	srv.Shutdown(ctx)
-	// 	cancel() // Cancel the context when SIGINT is received
-
-	// }()
 
 }
 func initRouter() *gin.Engine {
@@ -95,21 +77,14 @@ func testHandler(c *gin.Context) {
 	err := c.BindJSON(&r)
 	ctx, cancel := context.WithCancel(context.Background())
 
-	var sigCh = make(chan os.Signal, 1)
-	signal.Notify(sigCh, syscall.SIGINT)
 	done := make(chan bool)
 	go func() {
 
 		select {
 		case <-done:
-			fmt.Println("test doneeee")
+			fmt.Println("test done")
 			cancel()
-			return // cancel goroutine
-		case <-sigCh:
-			fmt.Println("cancel test")
 
-			cancel() // Cancel the context when SIGINT is received
-			// ...
 		}
 
 	}()
@@ -118,12 +93,12 @@ func testHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, responseError{Status: http.StatusBadRequest, Message: fmt.Sprint(err)})
 		return
 	}
-	// os.Getenv("auth")
-	if c.GetHeader("Authorization") == "1" {
+
+	if c.GetHeader("Authorization") == os.Getenv("auth") {
 		res := getTestResultsAsService(&r.Links, &r.Timeout, &r.UpperBoundPingLimit, &r.TestUrl, &ctx)
 		c.JSON(http.StatusBadRequest, responseLinks{Links: res})
 		done <- true
-		c.Abort()
+
 	} else {
 		c.JSON(http.StatusBadRequest, responseError{Status: http.StatusForbidden, Message: "request unauthorized."})
 

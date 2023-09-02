@@ -1,0 +1,53 @@
+name: Go CI / Coverage
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened]
+
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Save time
+        run: echo "ACTION_TIME=$(TZ=Asia/Tehran date +'%Y-%m-%d %H:%M:%S')" >> "$GITHUB_ENV"
+
+      - name: Telegram Commit Notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+              *New Commit Pushed To ${{ github.repository }}*
+              _Time:_ `${{ env.ACTION_TIME }}`
+              _Branch:_ `${{ github.ref }}`
+              _Committer:_ `${{ github.actor }}`
+              
+              Commit Message:
+              `${{ github.event.commits[0].message }}`
+        continue-on-error: false
+      
+      - name: Save time
+        run: echo "ACTION_TIME=$(TZ=Asia/Tehran date +'%Y-%m-%d %H:%M:%S')" >> "$GITHUB_ENV"
+      - name: Telegram Workflow Status
+        if: always() 
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          status: ${{ job.status }}
+          format: markdown
+          message: |
+            *Workflow Completed For ${{ github.repository }}*
+            
+            _Time:_ `${{ env.ACTION_TIME }}`
+            _Workflow:_ `${{ github.workflow }}`  
+            _Status:_ `${{ job.status }}`
+            
+            _Run URL:_ [${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+        continue-on-error: false
