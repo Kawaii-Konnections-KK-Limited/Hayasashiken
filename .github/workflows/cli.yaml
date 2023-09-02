@@ -1,12 +1,8 @@
 name: Go CI / Coverage
-
-on:
+on: 
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-    types: [opened]
-
+    branches:
+      - master
 
 jobs:
   notify:
