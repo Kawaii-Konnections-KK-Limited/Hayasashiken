@@ -44,8 +44,15 @@ func initRouter() *gin.Engine {
 	r.Use(gin.Recovery())
 
 	r.POST("/test", testHandler)
+	r.GET("/ping", pingSelf)
 
 	return r
+}
+
+func pingSelf(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": "pong",
+	})
 }
 
 type link struct {
@@ -96,7 +103,7 @@ func testHandler(c *gin.Context) {
 
 	if c.GetHeader("Authorization") == os.Getenv("auth") {
 		res := getTestResultsAsService(&r.Links, &r.Timeout, &r.UpperBoundPingLimit, &r.TestUrl, &ctx)
-		c.JSON(http.StatusBadRequest, responseLinks{Links: res})
+		c.JSON(http.StatusOK, responseLinks{Links: res})
 		done <- true
 
 	} else {
