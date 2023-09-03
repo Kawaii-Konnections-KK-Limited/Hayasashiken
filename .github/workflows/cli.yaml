@@ -6,6 +6,8 @@ on:
 env:
   DOCKER_REGISTRY: ghcr.io
   IMAGE_NAME: hayasashikan
+  ORG_NAME: Kawaii-Konnections-KK-Limited
+
 jobs:
   notify:
     runs-on: ubuntu-latest
@@ -37,8 +39,8 @@ jobs:
 
       - name: Build Hayasashikan image
         run: |
-          docker build -t $DOCKER_REGISTRY/$IMAGE_NAME/apiservice:latest -f Dockerfile .
-          docker push $DOCKER_REGISTRY/$IMAGE_NAME/apiservice:latest
+          docker build -t $DOCKER_REGISTRY/$ORG_NAME/$IMAGE_NAME/apiservice:latest -f Dockerfile .
+          docker push $DOCKER_REGISTRY/$ORG_NAME/$IMAGE_NAME/apiservice:latest
 
       
       - name: Save time
