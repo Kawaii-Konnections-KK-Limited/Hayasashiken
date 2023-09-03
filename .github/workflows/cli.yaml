@@ -35,8 +35,8 @@ jobs:
 
       - name: Build Hayasashikan image
         run: |
-          docker build -t $DOCKER_REGISTRY/$IMAGE_NAME/Hayasashikan:latest -f Dockerfile .
-          docker push $DOCKER_REGISTRY/$IMAGE_NAME/Hayasashikan:latest
+          docker build -t $DOCKER_REGISTRY/$IMAGE_NAME:latest -f Dockerfile .
+          docker push $DOCKER_REGISTRY/$IMAGE_NAME:latest
 
       
       - name: Save time
