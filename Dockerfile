@@ -5,12 +5,12 @@ WORKDIR /app
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix -tags with_utls cgo -o main cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix -tags with_utls cgo -o main start/main.go
 
 # Stage 2: Create the final image using Alpine
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates
+
 
 WORKDIR /root/
 COPY --from=builder /app/config/ config/
