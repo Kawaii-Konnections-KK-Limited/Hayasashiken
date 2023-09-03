@@ -5,6 +5,5 @@ testsite/
 db.sqlite3
 test.db
 test-some/
-main.go
 **/links.txt
 test.py

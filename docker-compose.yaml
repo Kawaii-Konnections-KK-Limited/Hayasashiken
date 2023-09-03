@@ -3,4 +3,7 @@ services:
     build:
       context: .
     container_name: v2ray_tester
+    environment:
+      - auth=1
+    restart: always
 
