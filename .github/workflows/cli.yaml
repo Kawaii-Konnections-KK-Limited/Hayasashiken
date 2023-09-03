@@ -9,7 +9,7 @@ env:
   ORG_NAME: kawaii-konnections-kk-limited
 
 jobs:
-  notify:
+  build-push:
     runs-on: ubuntu-latest
 
     steps:

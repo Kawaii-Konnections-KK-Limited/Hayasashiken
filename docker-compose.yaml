@@ -1,9 +1,10 @@
 services:
   tester:
-    build:
-      context: .
+    image: ghcr.io/kawaii-konnections-kk-limited/hayasashikan:latest
     container_name: v2ray_tester
     environment:
       - auth=1
+    ports:
+      - 8080:8080
     restart: always
 
