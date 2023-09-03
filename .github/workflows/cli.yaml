@@ -27,6 +27,17 @@ jobs:
               Commit Message:
               `${{ github.event.commits[0].message }}`
         continue-on-error: false
+      - uses: actions/checkout@v3
+
+      - name: Docker login
+        run: |
+          echo ${{ secrets.TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Hayasashikan image
+        run: |
+          docker build -t $DOCKER_REGISTRY/$IMAGE_NAME/Hayasashikan:latest -f Dockerfile .
+          docker push $DOCKER_REGISTRY/$IMAGE_NAME/Hayasashikan:latest
+
       
       - name: Save time
         run: echo "ACTION_TIME=$(TZ=Asia/Tehran date +'%Y-%m-%d %H:%M:%S')" >> "$GITHUB_ENV"
