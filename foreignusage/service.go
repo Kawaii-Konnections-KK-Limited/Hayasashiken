@@ -34,10 +34,4 @@ func InitService(certFile, keyFile *string) {
 		api.InitRouter().Run(fmt.Sprintf("%s:%s", addr, port))
 	}
 
-	// err := api.InitRouter().Run(":" + port)
-
-	// if err != nil {
-	// 	return
-	// }
-
 }

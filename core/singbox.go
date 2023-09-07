@@ -18,55 +18,50 @@ import (
 
 var disableColor bool
 
-func RunByLinkDep(wg *sync.WaitGroup, config *[]byte) error {
-	osSignals := make(chan os.Signal, 1)
-	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
-	defer signal.Stop(osSignals)
-	for {
-		// wg,
-		instance, cancel, err := createByLink(config)
-		if err != nil {
-			fmt.Println(err)
-		}
+// func RunByLinkDep(wg *sync.WaitGroup, config *[]byte) error {
+// 	osSignals := make(chan os.Signal, 1)
+// 	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
+// 	defer signal.Stop(osSignals)
+// 	for {
+// 		// wg,
+// 		instance, err := createByLink(config)
+// 		if err != nil {
+// 			fmt.Println(err)
+// 		}
 
-		for {
-			osSignal := <-osSignals
-			if osSignal == syscall.SIGHUP {
+// 		for {
+// 			osSignal := <-osSignals
+// 			if osSignal == syscall.SIGHUP {
 
-				if err != nil {
-					log.Error(E.Cause(err, "reload service"))
-					continue
-				}
-			}
-			cancel()
-			closeCtx, closed := context.WithCancel(context.Background())
-			go closeMonitor(closeCtx)
-			instance.Close()
-			closed()
-			if osSignal != syscall.SIGHUP {
-				return nil
-			}
-			break
-		}
-	}
-}
+// 				if err != nil {
+// 					log.Error(E.Cause(err, "reload service"))
+// 					continue
+// 				}
+// 			}
+
+//				closeCtx, closed := context.WithCancel(context.Background())
+//				go closeMonitor(closeCtx)
+//				instance.Close()
+//				closed()
+//				if osSignal != syscall.SIGHUP {
+//					return nil
+//				}
+//				break
+//			}
+//		}
+//	}
 func RunByLink(wg *sync.WaitGroup, config *[]byte, ctx context.Context, kills *chan bool) error {
-	osSignals := make(chan os.Signal, 1)
-	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
-	defer signal.Stop(osSignals)
+	// osSignals := make(chan os.Signal, 1)
+	// signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
+	// defer signal.Stop(osSignals)
 	for {
-		instance, cancel, err := createByLink(config)
+		instance, err := createByLink(config, ctx)
 		if err != nil {
 
 			wg.Done()
 			return err
 		}
-		if cancel == nil {
-			//return new error
-			wg.Done()
 
-			return errors.New("cancel is nil")
-		}
 		if instance == nil {
 
 			//return new error
@@ -82,28 +77,24 @@ func RunByLink(wg *sync.WaitGroup, config *[]byte, ctx context.Context, kills *c
 				// exit gracefully
 				fmt.Println("Context is done3")
 
-				cancel()
-
-				closeCtx, closed := context.WithCancel(ctx)
-				go closeMonitor(closeCtx)
+				// closeCtx, closed := context.WithCancel(ctx)
+				// go closeMonitor(closeCtx)
 
 				instance.Close()
 
-				closed()
+				// closed()
 				return nil
 
 			case k := <-*kills:
 
 				if k {
 					fmt.Println("kill")
-					closeCtx, closed := context.WithCancel(ctx)
-					go closeMonitor(closeCtx)
-
-					cancel()
+					// closeCtx, closed := context.WithCancel(ctx)
+					// go closeMonitor(closeCtx)
 
 					instance.Close()
 
-					closed()
+					// closed()
 
 					return nil
 				}
@@ -224,13 +215,15 @@ func createByLinkProxy(config *[]byte) (*box.Box, context.CancelFunc, error) {
 	}
 	return instance, cancel, nil
 }
-func createByLink(config *[]byte) (*box.Box, context.CancelFunc, error) {
+
+// , context.CancelFunc
+func createByLink(config *[]byte, ctx context.Context) (*box.Box, error) {
 
 	var options option.Options
 	err := options.UnmarshalJSON(*config)
 
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if disableColor {
 		if options.Log == nil {
@@ -238,35 +231,35 @@ func createByLink(config *[]byte) (*box.Box, context.CancelFunc, error) {
 		}
 		options.Log.DisableColor = true
 	}
-	ctx, cancel := context.WithCancel(context.Background())
+	// ctx, cancel := context.WithCancel(context.Background())
 	instance, err := box.New(box.Options{
 		Context: ctx,
 		Options: options,
 	})
 	if err != nil {
-		cancel()
-		return nil, nil, E.Cause(err, "create service")
+		// cancel()
+		return nil, E.Cause(err, "create service")
 	}
-	osSignals := make(chan os.Signal, 1)
-	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
+	// osSignals := make(chan os.Signal, 1)
+	// signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
 
-	defer func() {
-		signal.Stop(osSignals)
-		close(osSignals)
-	}()
+	// defer func() {
+	// 	signal.Stop(osSignals)
+	// 	close(osSignals)
+	// }()
 
-	go func() {
-		_, loaded := <-osSignals
-		if loaded {
-			cancel()
-		}
-	}()
+	// go func() {
+	// 	_, loaded := <-osSignals
+	// 	if loaded {
+	// 		cancel()
+	// 	}
+	// }()
 	err = instance.Start()
 	if err != nil {
-		cancel()
-		return nil, nil, E.Cause(err, "start service")
+		// cancel()
+		return nil, E.Cause(err, "start service")
 	}
-	return instance, cancel, nil
+	return instance, nil
 }
 func create(wg *sync.WaitGroup) (*box.Box, context.CancelFunc, error) {
 	var (

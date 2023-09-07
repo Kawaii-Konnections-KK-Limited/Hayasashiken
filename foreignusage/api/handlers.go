@@ -22,6 +22,7 @@ func testHandler(c *gin.Context) {
 		case <-done:
 			fmt.Println("test done")
 			cancel()
+			return
 
 		}
 

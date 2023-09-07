@@ -24,23 +24,21 @@ func SingByLink(Rawurl *string, Testurl *string, InputPort *int, TimeOut *int32,
 
 	go core.RunByLink(&wg, &c, ctx, kills)
 	wg.Wait()
-	for {
 
-		select {
-		case <-ctx.Done():
+	select {
+	case <-ctx.Done():
 
-			return 0, nil
+		return 0, nil
 
-		default:
-			res, err := raytest.GetTest(InputPort, Testurl, TimeOut)
+	default:
+		res, err := raytest.GetTest(InputPort, Testurl, TimeOut)
 
-			if err != nil {
-				fmt.Println(err)
-				return 0, err
-			}
-			return res, nil
-
+		if err != nil {
+			fmt.Println(err)
+			return 0, err
 		}
+		return res, nil
+
 	}
 
 }
