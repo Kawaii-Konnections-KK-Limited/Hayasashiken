@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/Kawaii-Konnections-KK-Limited/Hayasashiken/run"
@@ -22,7 +23,7 @@ func getTestResultsAsService(links *[]link, timeout *int32, upperBoundPingLimit 
 		go func(link *string, port int, i int) {
 			defer wg.Done()
 
-			r, _ := run.SingByLink(link, TestUrl, &port, timeout, &baseBroadcast, *ctx, &kills)
+			r, err := run.SingByLink(link, TestUrl, &port, timeout, &baseBroadcast, *ctx, &kills)
 			if r > 10 && r < *upperBoundPingLimit {
 				pairs = append(pairs, responseLink{
 					Ping: r,
@@ -32,6 +33,9 @@ func getTestResultsAsService(links *[]link, timeout *int32, upperBoundPingLimit 
 			} else {
 				kills <- true
 
+			}
+			if err != nil {
+				fmt.Println(err)
 			}
 
 		}(&link, port, id)

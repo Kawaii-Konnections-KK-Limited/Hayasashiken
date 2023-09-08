@@ -20,7 +20,7 @@ func testHandler(c *gin.Context) {
 
 		select {
 		case <-done:
-			fmt.Println("test done")
+
 			cancel()
 			return
 

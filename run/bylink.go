@@ -34,7 +34,7 @@ func SingByLink(Rawurl *string, Testurl *string, InputPort *int, TimeOut *int32,
 		res, err := raytest.GetTest(InputPort, Testurl, TimeOut)
 
 		if err != nil {
-			fmt.Println(err)
+
 			return 0, err
 		}
 		return res, nil

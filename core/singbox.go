@@ -75,7 +75,6 @@ func RunByLink(wg *sync.WaitGroup, config *[]byte, ctx context.Context, kills *c
 			select {
 			case <-ctx.Done():
 				// exit gracefully
-				fmt.Println("Context is done3")
 
 				// closeCtx, closed := context.WithCancel(ctx)
 				// go closeMonitor(closeCtx)
@@ -88,7 +87,7 @@ func RunByLink(wg *sync.WaitGroup, config *[]byte, ctx context.Context, kills *c
 			case k := <-*kills:
 
 				if k {
-					fmt.Println("kill")
+
 					// closeCtx, closed := context.WithCancel(ctx)
 					// go closeMonitor(closeCtx)
 

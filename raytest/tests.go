@@ -79,10 +79,9 @@ func GetTest(InPort *int, Destination *string, TimeOut *int32) (int32, error) {
 		}},
 	}
 
-	// link := Destination
-	link := "http://youtube.com"
+	link := Destination
 	// timeout := int32(5000) // timeout in milliseconds
-	rtt, testerr := urlTest(client, &link, TimeOut)
+	rtt, testerr := urlTest(client, link, TimeOut)
 	if testerr != nil {
 		// fmt.Println("Error:", testerr)
 		return 0, testerr

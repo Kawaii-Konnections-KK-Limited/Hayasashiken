@@ -6,7 +6,7 @@ require (
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/sagernet/sing v0.2.10-0.20230830132630-30bf19f2833c
-	github.com/sagernet/sing-box v1.4.1
+	github.com/sagernet/sing-box v1.4.0
 	gorm.io/gorm v1.25.2
 )
 
