@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"runtime/debug"
 	"sync"
 	"syscall"
 	"time"
@@ -76,24 +77,25 @@ func RunByLink(wg *sync.WaitGroup, config *[]byte, ctx context.Context, kills *c
 			case <-ctx.Done():
 				// exit gracefully
 
-				// closeCtx, closed := context.WithCancel(ctx)
-				// go closeMonitor(closeCtx)
+				closeCtx, closed := context.WithCancel(ctx)
+				go closeMonitor(closeCtx)
 
 				instance.Close()
-
-				// closed()
+				debug.FreeOSMemory()
+				closed()
 				return nil
 
 			case k := <-*kills:
 
 				if k {
 
-					// closeCtx, closed := context.WithCancel(ctx)
-					// go closeMonitor(closeCtx)
+					closeCtx, closed := context.WithCancel(ctx)
+					go closeMonitor(closeCtx)
 
 					instance.Close()
+					debug.FreeOSMemory()
 
-					// closed()
+					closed()
 
 					return nil
 				}
