@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"runtime/debug"
 	"sync"
 	"syscall"
 	"time"
@@ -81,7 +80,7 @@ func RunByLink(wg *sync.WaitGroup, config *[]byte, ctx context.Context, kills *c
 				go closeMonitor(closeCtx)
 
 				instance.Close()
-				debug.FreeOSMemory()
+				// debug.FreeOSMemory()
 				closed()
 				return nil
 
@@ -93,7 +92,7 @@ func RunByLink(wg *sync.WaitGroup, config *[]byte, ctx context.Context, kills *c
 					go closeMonitor(closeCtx)
 
 					instance.Close()
-					debug.FreeOSMemory()
+					// debug.FreeOSMemory()
 
 					closed()
 
